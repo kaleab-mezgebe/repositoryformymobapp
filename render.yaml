@@ -1,7 +1,7 @@
 services:
   - type: web
     name: repositoryformymobapp-kaleab-mezgebe
-    env: node
+    env: node-14
     branch: main
     buildCommand: npm install
     startCommand: node server.js
