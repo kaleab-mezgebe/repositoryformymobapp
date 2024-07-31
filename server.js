@@ -23,7 +23,6 @@ const PORT = process.env.PORT || 3000;
 //   password: "qiHGbyByQP",
 //   database: "sql8723174",
 // });
-MySQL connection using environment variables for configuration
 const connection = mysql.createConnection({
   host: process.env.MYSQL_HOST,
   user: process.env.MYSQL_USER,
