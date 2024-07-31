@@ -4,7 +4,7 @@ services:
     env: node
     branch: main
     buildCommand: npm install
-    startCommand: node index.js
+    startCommand: node server.js
     envVars:
       - key: MYSQL_HOST
         value: sql8.freesqldatabase.com
