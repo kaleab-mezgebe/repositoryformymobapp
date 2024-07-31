@@ -16,19 +16,19 @@ const PORT = process.env.PORT || 3000;
 //   password: "",
 //   database: "mydb",
 // });
-const connection = mysql.createConnection({
-  host: "sql8.freesqldatabase.com",
-  user: "sql8723174",
-  password: "qiHGbyByQP",
-  database: "sql8723174",
-});
-
 // const connection = mysql.createConnection({
-//   host: process.env.MYSQL_HOST,
-//   user: process.env.MYSQL_USER,
-//   password: process.env.MYSQL_PASSWORD,
-//   database: process.env.MYSQL_DATABASE,
+//   host: "sql8.freesqldatabase.com",
+//   user: "sql8723174",
+//   password: "qiHGbyByQP",
+//   database: "sql8723174",
 // });
+
+const connection = mysql.createConnection({
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+});
 
 // Connect to the MySQL server
 connection.connect(function (err) {
