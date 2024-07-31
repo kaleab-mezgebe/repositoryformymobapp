@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: my-node-app
+    name: repositoryformymobapp-kaleab-mezgebe
     env: node
     branch: main
     buildCommand: npm install
