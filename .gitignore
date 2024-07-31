@@ -142,3 +142,8 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/node
+MYSQL_HOST=sql8.freesqldatabase.com
+MYSQL_USER=sql8723174
+MYSQL_PASSWORD=qiHGbyByQP
+MYSQL_DATABASE=sql8723174
+PORT=3000
