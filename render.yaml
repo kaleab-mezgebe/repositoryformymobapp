@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: my-node-app
+    env: node
+    branch: main
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: MYSQL_HOST
+        value: sql8.freesqldatabase.com
+      - key: MYSQL_USER
+        value: sql8723174
+      - key: MYSQL_PASSWORD
+        value: qiHGbyByQP
+      - key: MYSQL_DATABASE
+        value: sql8723174
