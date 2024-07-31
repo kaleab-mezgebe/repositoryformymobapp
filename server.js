@@ -8,6 +8,7 @@ const app = express();
 const upload = multer(); // Initialize multer middleware
 const fs = require("fs");
 const moment = require("moment");
+const PORT = process.env.PORT || 3000;
 
 // const connection = mysql.createConnection({
 //   host: "127.0.0.1",
@@ -15,11 +16,18 @@ const moment = require("moment");
 //   password: "",
 //   database: "mydb",
 // });
+// const connection = mysql.createConnection({
+//   host: "sql8.freesqldatabase.com",
+//   user: "sql8723174",
+//   password: "qiHGbyByQP",
+//   database: "sql8723174",
+// });
+
 const connection = mysql.createConnection({
-  host: "sql8.freesqldatabase.com",
-  user: "sql8723174",
-  password: "qiHGbyByQP",
-  database: "sql8723174",
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
 });
 
 // Connect to the MySQL server
@@ -3434,7 +3442,7 @@ app.get("/getGalleryImages", (req, res) => {
     // Assuming image_of_heritage contains a comma-separated list of filenames
     const imageFilenames = results[0].image_of_heritage.split(",");
     const imageUrls = imageFilenames.map((filename) => {
-      return `http://localhost:3000/uploads/${filename.trim()}`; // Adjust according to your server
+      return `https://repositoryformymobapp-kaleab-mezgebe.onrender.com/uploads/${filename.trim()}`; // Adjust according to your server
     });
 
     res.json(imageUrls);
@@ -3462,7 +3470,7 @@ app.get("/getHeritageImage", (req, res) => {
     // Assuming image_of_heritage contains a comma-separated list of filenames
     const imageFilenames = results[0].descriptive_image_of_heritage.split(",");
     const imageHeritageUrls = imageFilenames.map((filename) => {
-      return `http://localhost:3000/uploads/${filename.trim()}`; // Adjust according to your server
+      return `https://repositoryformymobapp-kaleab-mezgebe.onrender.com/uploads/${filename.trim()}`; // Adjust according to your server
     });
 
     res.json(imageHeritageUrls);
@@ -3491,7 +3499,7 @@ app.get("/getGalleryNonMovImages", (req, res) => {
     // Assuming image_of_heritage contains a comma-separated list of filenames
     const imageFilenames = results[0].image_of_heritage.split(",");
     const imageUrls = imageFilenames.map((filename) => {
-      return `http://localhost:3000/uploads/${filename.trim()}`; // Adjust according to your server
+      return `https://repositoryformymobapp-kaleab-mezgebe.onrender.com/uploads/${filename.trim()}`; // Adjust according to your server
     });
 
     res.json(imageUrls);
@@ -3519,7 +3527,7 @@ app.get("/getNonMovHeritageImage", (req, res) => {
     // Assuming image_of_heritage contains a comma-separated list of filenames
     const imageFilenames = results[0].descriptive_image_of_heritage.split(",");
     const imageHeritageUrls = imageFilenames.map((filename) => {
-      return `http://localhost:3000/uploads/${filename.trim()}`; // Adjust according to your server
+      return `https://repositoryformymobapp-kaleab-mezgebe.onrender.com/uploads/${filename.trim()}`; // Adjust according to your server
     });
 
     res.json(imageHeritageUrls);
@@ -3552,6 +3560,6 @@ app.post("/users", (req, res) => {
 });
 
 // Serve static files from the uploads directory
-app.listen(process.env.PORT || 3000, function () {
-  console.log("Server is running on port 3000");
+app.listen(PORT, function () {
+  console.log(`Server is running on port ${PORT}`);
 });
