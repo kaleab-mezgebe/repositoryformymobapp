@@ -1,15 +1,15 @@
-// const express = require("express");
-// const mysql = require("mysql");
-// const bodyParser = require("body-parser");
-// const cors = require("cors");
-// const multer = require("multer");
-// const { connect } = require("mongoose");
-// const app = express();
-// const upload = multer(); // Initialize multer middleware
-// const fs = require("fs");
-// const moment = require("moment");
-// require("dotenv").config();
-// const PORT = process.env.PORT || 3000;
+const express = require("express");
+const mysql = require("mysql");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const multer = require("multer");
+const { connect } = require("mongoose");
+const app = express();
+const upload = multer(); // Initialize multer middleware
+const fs = require("fs");
+const moment = require("moment");
+require("dotenv").config();
+const PORT = process.env.PORT || 3000;
 
 // const connection = mysql.createConnection({
 //   host: "127.0.0.1",
@@ -17,12 +17,12 @@
 //   password: "",
 //   database: "mydb",
 // });
-// const connection = mysql.createConnection({
-//   host: "sql8.freesqldatabase.com",
-//   user: "sql8723174",
-//   password: "qiHGbyByQP",
-//   database: "sql8723174",
-// });
+const connection = mysql.createConnection({
+  host: "sql8.freesqldatabase.com",
+  user: "sql8723174",
+  password: "qiHGbyByQP",
+  database: "sql8723174",
+});
 // const connection = mysql.createConnection({
 //   host: process.env.MYSQL_HOST,
 //   user: process.env.MYSQL_USER,
@@ -31,72 +31,27 @@
 // });
 
 // Connect to the MySQL server
-// connection.connect(function (err) {
-//   if (err) {
-//     console.error("Error connecting to MySQL: ", err);
-//     return;
-//   }
-//   console.log("Connected to MySQL");
-// });
-// app.use(express.json());
-// 1. Login route
-// app.post("/login", (req, res) => {
-//   const { username, password, role } = req.body;
-
-  // Query the database to check if the user exists
-  // connection.query(
-  //   "SELECT * FROM user WHERE username = ? AND password = ? AND role = ?",
-  //   [username, password, role],
-  //   (err, results) => {
-  //     if (err) {
-  //       console.error(err);
-  //       return res.status(500).json({ error: "Internal server error" });
-  //     }
-
-  //     if (results.length === 0) {
-  //       return res.status(401).json({ error: "Invalid credentials" });
-  //     }
-
-      // User is authenticated, you can return a JWT token or any other authentication mechanism
-//       return res.status(200).json({ message: "Login successful" });
-//     }
-//   );
-// });
-
-const express = require("express");
-const mysql = require("mysql");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const multer = require("multer");
-require("dotenv").config();
-const app = express();
-const upload = multer(); // Initialize multer middleware
-const PORT = process.env.PORT || 3000;
-
-// Create a MySQL connection pool
-const pool = mysql.createPool({
-  connectionLimit: 10, // Maximum number of connections to create at once
-  host: "sql8.freesqldatabase.com", // or process.env.MYSQL_HOST
-  user: "sql8723174", // or process.env.MYSQL_USER
-  password: "qiHGbyByQP", // or process.env.MYSQL_PASSWORD
-  database: "sql8723174", // or process.env.MYSQL_DATABASE
+pool.getConnection((err, connection) => {
+  if (err) {
+    console.error("Error connecting to MySQL: ", err);
+    return;
+  }
+  console.log("Connected to MySQL");
+  // Release the connection back to the pool
+  connection.release();
 });
-
-// Middleware
-app.use(cors());
 app.use(express.json());
-
 // 1. Login route
 app.post("/login", (req, res) => {
   const { username, password, role } = req.body;
 
   // Query the database to check if the user exists
-  pool.query(
+  connection.query(
     "SELECT * FROM user WHERE username = ? AND password = ? AND role = ?",
     [username, password, role],
     (err, results) => {
       if (err) {
-        console.error("Database query error: ", err);
+        console.error(err);
         return res.status(500).json({ error: "Internal server error" });
       }
 
@@ -104,11 +59,58 @@ app.post("/login", (req, res) => {
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
-      // User is authenticated; you can return a JWT token or any other authentication mechanism
+      // User is authenticated, you can return a JWT token or any other authentication mechanism
       return res.status(200).json({ message: "Login successful" });
     }
   );
 });
+
+// const express = require("express");
+// const mysql = require("mysql");
+// const bodyParser = require("body-parser");
+// const cors = require("cors");
+// const multer = require("multer");
+// require("dotenv").config();
+// const app = express();
+// const upload = multer(); // Initialize multer middleware
+// const PORT = process.env.PORT || 3000;
+
+// // Create a MySQL connection pool
+// const pool = mysql.createPool({
+//   connectionLimit: 10, // Maximum number of connections to create at once
+//   host: "sql8.freesqldatabase.com", // or process.env.MYSQL_HOST
+//   user: "sql8723174", // or process.env.MYSQL_USER
+//   password: "qiHGbyByQP", // or process.env.MYSQL_PASSWORD
+//   database: "sql8723174", // or process.env.MYSQL_DATABASE
+// });
+
+// // Middleware
+// app.use(cors());
+// app.use(express.json());
+
+// // 1. Login route
+// app.post("/login", (req, res) => {
+//   const { username, password, role } = req.body;
+
+//   // Query the database to check if the user exists
+//   pool.query(
+//     "SELECT * FROM user WHERE username = ? AND password = ? AND role = ?",
+//     [username, password, role],
+//     (err, results) => {
+//       if (err) {
+//         console.error("Database query error: ", err);
+//         return res.status(500).json({ error: "Internal server error" });
+//       }
+
+//       if (results.length === 0) {
+//         return res.status(401).json({ error: "Invalid credentials" });
+//       }
+
+//       // User is authenticated; you can return a JWT token or any other authentication mechanism
+//       return res.status(200).json({ message: "Login successful" });
+//     }
+//   );
+// });
 
 // Configure multer storage
 // const storage = multer.diskStorage({
