@@ -23,6 +23,7 @@ const connection = mysql.createConnection({
   password: "qiHGbyByQP",
   database: "sql8723174",
 });
+// MySQL connection using environment variables for configuration
 // const connection = mysql.createConnection({
 //   host: process.env.MYSQL_HOST,
 //   user: process.env.MYSQL_USER,
@@ -31,14 +32,12 @@ const connection = mysql.createConnection({
 // });
 
 // Connect to the MySQL server
-pool.getConnection((err, connection) => {
+connection.connect(function (err) {
   if (err) {
     console.error("Error connecting to MySQL: ", err);
     return;
   }
   console.log("Connected to MySQL");
-  // Release the connection back to the pool
-  connection.release();
 });
 app.use(express.json());
 // 1. Login route
@@ -64,6 +63,7 @@ app.post("/login", (req, res) => {
     }
   );
 });
+
 
 // const express = require("express");
 // const mysql = require("mysql");
