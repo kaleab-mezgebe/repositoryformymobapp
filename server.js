@@ -18,10 +18,11 @@ const PORT = process.env.PORT || 3000;
 //   database: "mydb",
 // });
 const connection = mysql.createConnection({
-  host: "sql8.freesqldatabase.com",
-  user: "sql8723174",
-  password: "qiHGbyByQP",
-  database: "sql8723174",
+  host: "sql12.freesqldatabase.com",
+  user: "sql12724553",
+  password: "e3hwiUkgnl",
+  database: "sql12724553",
+
 });
 // MySQL connection using environment variables for configuration
 // const connection = mysql.createConnection({
