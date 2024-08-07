@@ -32,14 +32,42 @@ const connection = mysql.createConnection({
 // });
 
 // Connect to the MySQL server
-connection.connect(function (err) {
+// connection.connect(function (err) {
+//   if (err) {
+//     console.error("Error connecting to MySQL: ", err);
+//     return;
+//   }
+//   console.log("Connected to MySQL");
+// });
+// app.use(express.json());
+// Function to check the connection state and reconnect if necessary
+function checkAndReconnectConnection() {
+  if (connection.state === 'disconnected') {
+    connection.connect((err) => {
+      if (err) {
+        console.error('Error connecting to MySQL:', err);
+      } else {
+        console.log('Reconnected to MySQL');
+      }
+    });
+  }
+}
+
+// Connect to the MySQL server
+connection.connect((err) => {
   if (err) {
     console.error("Error connecting to MySQL: ", err);
     return;
   }
   console.log("Connected to MySQL");
 });
-app.use(express.json());
+
+// Middleware to check the connection state before executing a query
+app.use((req, res, next) => {
+  checkAndReconnectConnection();
+  next();
+});
+
 // 1. Login route
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
