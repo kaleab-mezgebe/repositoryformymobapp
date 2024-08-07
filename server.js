@@ -40,7 +40,7 @@ connection.connect(function (err) {
   console.log("Connected to MySQL");
 });
 app.use(express.json());
-Function to check the connection state and reconnect if necessary
+// Function to check the connection state and reconnect if necessary
 
 // 1. Login route
 app.post("/login", (req, res) => {
