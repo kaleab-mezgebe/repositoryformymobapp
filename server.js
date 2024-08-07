@@ -17,19 +17,19 @@ const PORT = process.env.PORT || 3000;
 //   password: "",
 //   database: "mydb",
 // });
-// const connection = mysql.createConnection({
-//   host: "sql8.freesqldatabase.com",
-//   user: "sql8723174",
-//   password: "qiHGbyByQP",
-//   database: "sql8723174",
-// });
-// MySQL connection using environment variables for configuration
 const connection = mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
+  host: "sql8.freesqldatabase.com",
+  user: "sql8723174",
+  password: "qiHGbyByQP",
+  database: "sql8723174",
 });
+// MySQL connection using environment variables for configuration
+// const connection = mysql.createConnection({
+//   host: process.env.MYSQL_HOST,
+//   user: process.env.MYSQL_USER,
+//   password: process.env.MYSQL_PASSWORD,
+//   database: process.env.MYSQL_DATABASE,
+// });
 
 // Connect to the MySQL server
 connection.connect(function (err) {
@@ -42,36 +42,46 @@ connection.connect(function (err) {
 app.use(express.json());
 // 1. Login route
 app.post("/login", (req, res) => {
-  const { username, password, role } = req.body;
+  const { username, password } = req.body;
 
-  // Query the database to check if the user exists
+  // Query the database to find the user with the provided username.
   connection.query(
-    "SELECT * FROM user WHERE username = ? AND password = ? AND role = ?",
-    [username, password, role],
+    "SELECT role, password FROM user WHERE username = ?",
+    [username],
     (err, results) => {
       if (err) {
         console.error(err);
         return res.status(500).json({ error: "Internal server error" });
       }
 
+      // If no user is found, indicate the username is invalid.
       if (results.length === 0) {
-        return res.status(401).json({ error: "Invalid credentials" });
+        return res.status(401).json({ error: "Invalid username or password" });
       }
 
-      // User is authenticated, you can return a JWT token or any other authentication mechanism
-      return res.status(200).json({ message: "Login successful" });
+      const user = results[0];
+
+      // Here you should compare hashed passwords (for security)
+      // For simplicity, we compare plain-text passwords here.
+      if (user.password !== password) {
+        return res.status(401).json({ error: "Invalid username or password" });
+      }
+
+      // Successful login returns the user's role
+      return res
+        .status(200)
+        .json({ message: "Login successful", role: user.role });
     }
   );
 });
-
 // Configure multer storage
 // const storage = multer.diskStorage({
 //   destination: function (req, file, cb) {
 //     cb(null, "./uploads"); // Set destination folder for uploaded files
 //   },
-//   filename: function (req, file, cb) {
-//     cb(null, Date.now() + "-" + file.originalname); // Set unique filename
-//   },
+// filename: function (req, file, cb) {
+//   cb(null, Date.now() + "-" + file.originalname); // Set unique filename
+// },
 // });
 // // Configure multer storage the latest was this
 // const storage = multer.diskStorage({
@@ -87,8 +97,11 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads"); // Set destination folder for uploaded files
   },
+  // filename: function (req, file, cb) {
+  //   cb(null, file.originalname); // Use the original filename without the uploads\ prefix
+  // },
   filename: function (req, file, cb) {
-    cb(null, file.originalname); // Use the original filename without the uploads\ prefix
+    cb(null, Date.now() + "-" + file.originalname); // Set unique filename
   },
 });
 // const storage = multer.diskStorage({
@@ -840,8 +853,11 @@ app.post(
 
     const {
       usernameValue,
+      heritageImageDescription,
       heritageNameValue,
       localNameValue,
+      heritageImagesDescription,
+
       classOfHeritageValue,
       regionValue,
       zoneValue,
@@ -1005,9 +1021,11 @@ app.post(
   (
       username_of_data_collector,
       descriptive_image_of_heritage,
+      caption_for_image_of_heritage,
       heritage_name,
       local_name,
       image_of_heritage,
+      caption_for_image_of_heritages,
       class_of_heritage,
       region,
       zone,
@@ -1084,16 +1102,19 @@ app.post(
       registration_date_of_heritage
       
       )
-  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
 
     connection.query(
       sql,
       [
         usernameValue,
         descriptiveImageOfHeritageValue,
+        heritageImageDescription,
         heritageNameValue,
         localNameValue,
         imagePaths,
+
+        heritageImagesDescription,
         classOfHeritage,
         regionValue,
         zoneValue,
@@ -1196,7 +1217,10 @@ app.post(
     const {
       usernameValue,
       heritageNameValue,
+      heritageImageDescription,
       localNameValue,
+      heritageImagesDescription,
+
       classOfHeritageValue,
       regionValue,
       zoneValue,
@@ -1242,6 +1266,7 @@ app.post(
       significanceOfHeritageValue,
       statusOfTheHeritageValue,
       ifDestructedDescriptionOfHeritageDestructionValue,
+      otherHeritagesStatus,
       conditionOfHeritageDestructionValue,
       descriptionConditionOfHeritageDestructionValue,
       maintenanceValue,
@@ -1342,11 +1367,13 @@ app.post(
   INSERT INTO non_movable_heritage_data
   (
       username_of_data_collector,
-            descriptive_image_of_heritage,
-
+      descriptive_image_of_heritage,
+      caption_for_image_of_heritage,
       heritage_name,
       local_name,
       image_of_heritage,
+      caption_for_image_of_heritages,
+
       class_of_heritage,
       region,
       zone,
@@ -1392,6 +1419,7 @@ app.post(
       significance_of_heritage,
       status_of_the_heritage,
       if_destructed_description_of_heritage_destruction,
+      other_heritages_status,
       condition_of_heritage_destruction,
       description_condition_of_heritage_destruction,
       maintenance,
@@ -1425,16 +1453,18 @@ app.post(
       role,
       registration_date_of_heritage
       )
-  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
 
     connection.query(
       sql,
       [
         usernameValue,
         descriptiveImageOfHeritageValue,
+        heritageImageDescription,
         heritageNameValue,
         localNameValue,
         imagePaths,
+        heritageImagesDescription,
         classOfHeritage,
         regionValue,
         zoneValue,
@@ -1480,6 +1510,7 @@ app.post(
         significanceOfHeritageValue,
         statusOfTheHeritageValue,
         ifDestructedDescriptionOfHeritageDestructionValue,
+        otherHeritagesStatus,
         conditionOfHeritageDestructionValue,
         descriptionConditionOfHeritageDestructionValue,
         maintenanceValue,
@@ -1593,8 +1624,11 @@ app.put("/updateheritage/:id", (req, res) => {
   const id = req.params.id;
   const {
     heritage_name,
+    caption_for_image_of_heritage,
     local_name,
     class_of_heritage,
+    caption_for_image_of_heritages,
+
     region,
     zone,
     wereda,
@@ -1679,8 +1713,11 @@ app.put("/updateheritage/:id", (req, res) => {
   connection.query(
     `UPDATE movable_data
     SET 
+    caption_for_image_of_heritage=?,
       heritage_name = ?, 
       local_name = ?, 
+          caption_for_image_of_heritages=?,
+
       class_of_heritage = ?, 
       region = ?, 
       zone = ?, 
@@ -1764,8 +1801,11 @@ registration_date_of_heritage=?
 
 WHERE id = ?`,
     [
+      caption_for_image_of_heritage,
       heritage_name,
       local_name,
+      caption_for_image_of_heritages,
+
       class_of_heritage,
       region,
       zone,
@@ -1961,8 +2001,11 @@ app.put("/updateNonMovableHeritage/:id", (req, res) => {
 
   const {
     username_of_data_collector,
+    caption_for_image_of_heritage,
     heritage_name,
     local_name,
+    caption_for_image_of_heritages,
+
     class_of_heritage,
     region,
     zone,
@@ -2008,6 +2051,7 @@ app.put("/updateNonMovableHeritage/:id", (req, res) => {
     significance_of_heritage,
     status_of_the_heritage,
     if_destructed_description_of_heritage_destruction,
+    other_heritages_status,
     condition_of_heritage_destruction,
     description_condition_of_heritage_destruction,
     maintenance,
@@ -2044,8 +2088,11 @@ app.put("/updateNonMovableHeritage/:id", (req, res) => {
     `UPDATE non_movable_heritage_data
     SET 
     username_of_data_collector= ?,
+    caption_for_image_of_heritage=?,
     heritage_name= ?,
     local_name= ?,
+        caption_for_image_of_heritages=?,
+
     class_of_heritage= ?,
     region= ?,
     zone= ?,
@@ -2091,6 +2138,7 @@ app.put("/updateNonMovableHeritage/:id", (req, res) => {
     significance_of_heritage= ?,
     status_of_the_heritage= ?,
     if_destructed_description_of_heritage_destruction= ?,
+    other_heritages_status= ?,
     condition_of_heritage_destruction= ?,
     description_condition_of_heritage_destruction= ?,
     maintenance= ?,
@@ -2128,8 +2176,11 @@ app.put("/updateNonMovableHeritage/:id", (req, res) => {
 WHERE id = ?`,
     [
       username_of_data_collector,
+      caption_for_image_of_heritage,
       heritage_name,
       local_name,
+      caption_for_image_of_heritages,
+
       class_of_heritage,
       region,
       zone,
@@ -2173,6 +2224,7 @@ WHERE id = ?`,
       significance_of_heritage,
       status_of_the_heritage,
       if_destructed_description_of_heritage_destruction,
+      other_heritages_status,
       condition_of_heritage_destruction,
       description_condition_of_heritage_destruction,
       maintenance,
@@ -2333,6 +2385,32 @@ app.get("/getMovableDataa", (req, res) => {
   });
 });
 
+app.get("/getMovableDataaa", (req, res) => {
+  const id = req.query.id; // Use id instead of username
+  const query = `SELECT * FROM movable_data WHERE id='${id}'`;
+
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error("Error retrieving data:", err);
+      res.status(500).json({ error: "Error retrieving data" });
+      return;
+    }
+    res.json(results);
+  });
+});
+app.get("/getNonMovableDataaa", (req, res) => {
+  const id = req.query.id; // Use id instead of username
+  const query = `SELECT * FROM non_movable_heritage_data WHERE id='${id}'`;
+
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error("Error retrieving data:", err);
+      res.status(500).json({ error: "Error retrieving data" });
+      return;
+    }
+    res.json(results);
+  });
+});
 // // 22.View Each Non Movable Data in Table Format
 // app.get("/getnonMovableDataa", (req, res) => {
 //   const id = req.query.id; // Use id instead of username
@@ -2417,10 +2495,12 @@ app.get("/getnonMovableDataa", (req, res) => {
 
       "ኩነታት ጉድኣት እንትግለፅ":
         result.if_destructed_description_of_heritage_destruction,
+      "ምስቲ ሓድጊ ዘለው ካልኦት ሓድግታት ኩነታቶም እንትግለፅ": result.other_heritages_status,
       "ኩነታት ሓደጋ/ስግኣት ኣብቲ ሓድጊ": result.condition_of_heritage_destruction,
       "ኩነታት ሓደጋ/ስግኣት ኣብቲ ሓድጊ እንተሃልዩ":
         result.description_condition_of_heritage_destruction,
       "ቅድሚ ሐዚ ዝተገበረሉ ናይ ዕቀባን ፅገና ስራሕ": result.maintenance,
+
       "ምክንያት ፅገናኡ": result.reason_of_maintenance,
       "ዝፀገኖ ኣካል (ነቲ ፅገና ዘካየደ ኣካል)": result.maintained_by,
       "ፅገና ዝተካየደሉ እዋን": moment(result.maintained_on).format("DD-MM-YYYY"),
