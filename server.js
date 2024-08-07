@@ -31,7 +31,7 @@ const connection = mysql.createConnection({
 //   database: process.env.MYSQL_DATABASE,
 // });s
 
-Connect to the MySQL server
+// Connect to the MySQL server
 connection.connect(function (err) {
   if (err) {
     console.error("Error connecting to MySQL: ", err);
