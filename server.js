@@ -22,13 +22,13 @@ const PORT = process.env.PORT || 3000;
 //   database: "mydb",
 // });
 
-const connection = mysql.createConnection({
-  host: "sql12.freesqldatabase.com",
-  user: "sql12724553",
-  password: "e3hwiUkgnl",
-  database: "sql12724553",
+// const connection = mysql.createConnection({
+//   host: "sql12.freesqldatabase.com",
+//   user: "sql12724553",
+//   password: "e3hwiUkgnl",
+//   database: "sql12724553",
 
-});
+// });
 
 
 // MySQL connection using environment variables for configuration
@@ -40,13 +40,46 @@ const connection = mysql.createConnection({
 // });
 
 // Connect to the MySQL server
-connection.connect(function (err) {
-  if (err) {
-    console.error("Error connecting to MySQL: ", err);
-    return;
-  }
-  console.log("Connected to MySQL");
-});
+// connection.connect(function (err) {
+//   if (err) {
+//     console.error("Error connecting to MySQL: ", err);
+//     return;
+//   }
+//   console.log("Connected to MySQL");
+// });
+
+const connectionConfig = {
+  host: "sql12.freesqldatabase.com",
+  user: "sql12724553",
+  password: "e3hwiUkgnl",
+  database: "sql12724553",
+};
+
+let connection;
+
+function handleDisconnect() {
+  connection = mysql.createConnection(connectionConfig);
+
+  connection.connect(function(err) {
+    if (err) {
+      console.error("Error connecting to MySQL: ", err);
+      setTimeout(handleDisconnect, 2000); // Try to reconnect after 2 seconds
+    } else {
+      console.log("Connected to MySQL");
+    }
+  });
+
+  connection.on("error", function(err) {
+    console.error("MySQL error: ", err);
+    if (err.code === "PROTOCOL_CONNECTION_LOST") {
+      handleDisconnect(); // Automatically reconnect after connection is lost
+    } else {
+      throw err; // If it's a different error, throw it
+    }
+  });
+}
+
+handleDisconnect();
 app.use(express.json());
 
 // Function to check the connection state and reconnect if necessary
