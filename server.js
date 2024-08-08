@@ -48,7 +48,6 @@ const PORT = process.env.PORT || 3000;
 //   console.log("Connected to MySQL");
 // });
 
-const mysql = require('mysql');
 
 const connectionConfig = {
   host: "sql12.freesqldatabase.com",
