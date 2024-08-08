@@ -48,6 +48,8 @@ const PORT = process.env.PORT || 3000;
 //   console.log("Connected to MySQL");
 // });
 
+const mysql = require('mysql');
+
 const connectionConfig = {
   host: "sql12.freesqldatabase.com",
   user: "sql12724553",
@@ -73,8 +75,9 @@ function handleDisconnect() {
     console.error("MySQL error: ", err);
     if (err.code === "PROTOCOL_CONNECTION_LOST") {
       handleDisconnect(); // Automatically reconnect after connection is lost
-    } else {
-      throw err; // If it's a different error, throw it
+    } else if (err.code !== 'ECONNREFUSED') {
+      // If it's not a "connection refused" error, throw the error
+      throw err;
     }
   });
 }
