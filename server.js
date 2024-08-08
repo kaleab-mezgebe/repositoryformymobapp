@@ -1,3 +1,7 @@
+
+
+
+
 const express = require("express");
 const mysql = require("mysql");
 const bodyParser = require("body-parser");
@@ -17,6 +21,7 @@ const PORT = process.env.PORT || 3000;
 //   password: "",
 //   database: "mydb",
 // });
+
 const connection = mysql.createConnection({
   host: "sql12.freesqldatabase.com",
   user: "sql12724553",
@@ -24,13 +29,15 @@ const connection = mysql.createConnection({
   database: "sql12724553",
 
 });
+
+
 // MySQL connection using environment variables for configuration
 // const connection = mysql.createConnection({
 //   host: process.env.MYSQL_HOST,
 //   user: process.env.MYSQL_USER,
 //   password: process.env.MYSQL_PASSWORD,
 //   database: process.env.MYSQL_DATABASE,
-// });s
+// });
 
 // Connect to the MySQL server
 connection.connect(function (err) {
@@ -41,6 +48,7 @@ connection.connect(function (err) {
   console.log("Connected to MySQL");
 });
 app.use(express.json());
+
 // Function to check the connection state and reconnect if necessary
 
 // 1. Login route
