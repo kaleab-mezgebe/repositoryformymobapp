@@ -50,10 +50,11 @@ const PORT = process.env.PORT || 3000;
 
 
 const connectionConfig = {
-  host: "sql12.freesqldatabase.com",
-  user: "sql12724553",
-  password: "e3hwiUkgnl",
-  database: "sql12724553",
+  host: "sql7.freesqldatabase.com",
+  user: "sql7727012",
+  password: "LELVmWl2pf",
+  database: "sql7727012",
+
 };
 
 let connection;
