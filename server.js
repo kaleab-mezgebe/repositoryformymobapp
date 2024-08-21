@@ -53,7 +53,6 @@ function handleDisconnect() {
 
 handleDisconnect();
 
-const app = express();
 app.use(express.json());
 
 // 1. Login route
