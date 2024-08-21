@@ -14,8 +14,6 @@ const fs = require("fs");
 const moment = require("moment");
 require("dotenv").config();
 const PORT = process.env.PORT || 3000;
-const express = require('express');
-const mysql = require('mysql');
 
 const connectionConfig = {
   host: "sql7.freesqldatabase.com",
