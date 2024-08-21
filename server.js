@@ -14,47 +14,14 @@ const fs = require("fs");
 const moment = require("moment");
 require("dotenv").config();
 const PORT = process.env.PORT || 3000;
-
-// const connection = mysql.createConnection({
-//   host: "127.0.0.1",
-//   user: "root",
-//   password: "",
-//   database: "mydb",
-// });
-
-// const connection = mysql.createConnection({
-//   host: "sql12.freesqldatabase.com",
-//   user: "sql12724553",
-//   password: "e3hwiUkgnl",
-//   database: "sql12724553",
-
-// });
-
-
-// MySQL connection using environment variables for configuration
-// const connection = mysql.createConnection({
-//   host: process.env.MYSQL_HOST,
-//   user: process.env.MYSQL_USER,
-//   password: process.env.MYSQL_PASSWORD,
-//   database: process.env.MYSQL_DATABASE,
-// });
-
-// Connect to the MySQL server
-// connection.connect(function (err) {
-//   if (err) {
-//     console.error("Error connecting to MySQL: ", err);
-//     return;
-//   }
-//   console.log("Connected to MySQL");
-// });
-
+const express = require('express');
+const mysql = require('mysql');
 
 const connectionConfig = {
   host: "sql7.freesqldatabase.com",
   user: "sql7727012",
   password: "LELVmWl2pf",
   database: "sql7727012",
-
 };
 
 let connection;
@@ -62,30 +29,34 @@ let connection;
 function handleDisconnect() {
   connection = mysql.createConnection(connectionConfig);
 
-  connection.connect(function(err) {
+  connection.connect((err) => {
     if (err) {
       console.error("Error connecting to MySQL: ", err);
       setTimeout(handleDisconnect, 2000); // Try to reconnect after 2 seconds
     } else {
       console.log("Connected to MySQL");
-    }
-  });
 
-  connection.on("error", function(err) {
-    console.error("MySQL error: ", err);
-    if (err.code === "PROTOCOL_CONNECTION_LOST") {
-      handleDisconnect(); // Automatically reconnect after connection is lost
-    } else if (err.code !== 'ECONNREFUSED') {
-      // If it's not a "connection refused" error, throw the error
-      throw err;
+      connection.on("error", (err) => {
+        if (err.code === "PROTOCOL_CONNECTION_LOST") {
+          // Connection to the MySQL server is usually lost due to either server timeout or transient
+          // network issues. The following tries to reconnect with a backoff strategy to
+          // avoid flooding the server with reconnects at the cost of slightly longer
+          // downtime for users.
+          console.error("MySQL connection lost, reconnecting...", err);
+          setTimeout(handleDisconnect, 2000);
+        } else {
+          console.error("MySQL error: ", err);
+          throw err;
+        }
+      });
     }
   });
 }
 
 handleDisconnect();
-app.use(express.json());
 
-// Function to check the connection state and reconnect if necessary
+const app = express();
+app.use(express.json());
 
 // 1. Login route
 app.post("/login", (req, res) => {
@@ -121,24 +92,11 @@ app.post("/login", (req, res) => {
     }
   );
 });
-// Configure multer storage
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "./uploads"); // Set destination folder for uploaded files
-//   },
-// filename: function (req, file, cb) {
-//   cb(null, Date.now() + "-" + file.originalname); // Set unique filename
-// },
-// });
-// // Configure multer storage the latest was this
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "./uploads"); // Set destination folder for uploaded files
-//   },
-//   filename: function (req, file, cb) {
-//     cb(null, file.originalname); // Use the original filename without the uploads\ prefix
-//   },
-// });
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
