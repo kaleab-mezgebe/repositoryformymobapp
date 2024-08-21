@@ -90,10 +90,6 @@ app.post("/login", (req, res) => {
   );
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
