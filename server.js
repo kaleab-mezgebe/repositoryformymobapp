@@ -14,53 +14,19 @@ const fs = require("fs");
 const moment = require("moment");
 require("dotenv").config();
 const PORT = process.env.PORT || 3000;
-
-const connectionConfig = {
+const pool = mysql.createPool({
+  connectionLimit: 10, // The maximum number of connections to create at once
   host: "sql7.freesqldatabase.com",
   user: "sql7727012",
   password: "LELVmWl2pf",
   database: "sql7727012",
-};
+});
 
-let connection;
-
-function handleDisconnect() {
-  connection = mysql.createConnection(connectionConfig);
-
-  connection.connect((err) => {
-    if (err) {
-      console.error("Error connecting to MySQL: ", err);
-      setTimeout(handleDisconnect, 2000); // Try to reconnect after 2 seconds
-    } else {
-      console.log("Connected to MySQL");
-
-      connection.on("error", (err) => {
-        if (err.code === "PROTOCOL_CONNECTION_LOST") {
-          // Connection to the MySQL server is usually lost due to either server timeout or transient
-          // network issues. The following tries to reconnect with a backoff strategy to
-          // avoid flooding the server with reconnects at the cost of slightly longer
-          // downtime for users.
-          console.error("MySQL connection lost, reconnecting...", err);
-          setTimeout(handleDisconnect, 2000);
-        } else {
-          console.error("MySQL error: ", err);
-          throw err;
-        }
-      });
-    }
-  });
-}
-
-handleDisconnect();
-
-app.use(express.json());
-
-// 1. Login route
+// Example query using the pool
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
-  // Query the database to find the user with the provided username.
-  connection.query(
+  pool.query(
     "SELECT role, password FROM user WHERE username = ?",
     [username],
     (err, results) => {
@@ -83,12 +49,86 @@ app.post("/login", (req, res) => {
       }
 
       // Successful login returns the user's role
-      return res
-        .status(200)
-        .json({ message: "Login successful", role: user.role });
+      return res.status(200).json({ message: "Login successful", role: user.role });
     }
   );
 });
+
+
+// const connectionConfig = {
+//   host: "sql7.freesqldatabase.com",
+//   user: "sql7727012",
+//   password: "LELVmWl2pf",
+//   database: "sql7727012",
+// };
+
+// let connection;
+
+// function handleDisconnect() {
+//   connection = mysql.createConnection(connectionConfig);
+
+//   connection.connect((err) => {
+//     if (err) {
+//       console.error("Error connecting to MySQL: ", err);
+//       setTimeout(handleDisconnect, 2000); // Try to reconnect after 2 seconds
+//     } else {
+//       console.log("Connected to MySQL");
+
+//       connection.on("error", (err) => {
+//         if (err.code === "PROTOCOL_CONNECTION_LOST") {
+//           // Connection to the MySQL server is usually lost due to either server timeout or transient
+//           // network issues. The following tries to reconnect with a backoff strategy to
+//           // avoid flooding the server with reconnects at the cost of slightly longer
+//           // downtime for users.
+//           console.error("MySQL connection lost, reconnecting...", err);
+//           setTimeout(handleDisconnect, 2000);
+//         } else {
+//           console.error("MySQL error: ", err);
+//           throw err;
+//         }
+//       });
+//     }
+//   });
+// }
+
+// handleDisconnect();
+
+// app.use(express.json());
+
+// // 1. Login route
+// app.post("/login", (req, res) => {
+//   const { username, password } = req.body;
+
+//   // Query the database to find the user with the provided username.
+//   connection.query(
+//     "SELECT role, password FROM user WHERE username = ?",
+//     [username],
+//     (err, results) => {
+//       if (err) {
+//         console.error(err);
+//         return res.status(500).json({ error: "Internal server error" });
+//       }
+
+//       // If no user is found, indicate the username is invalid.
+//       if (results.length === 0) {
+//         return res.status(401).json({ error: "Invalid username or password" });
+//       }
+
+//       const user = results[0];
+
+//       // Here you should compare hashed passwords (for security)
+//       // For simplicity, we compare plain-text passwords here.
+//       if (user.password !== password) {
+//         return res.status(401).json({ error: "Invalid username or password" });
+//       }
+
+//       // Successful login returns the user's role
+//       return res
+//         .status(200)
+//         .json({ message: "Login successful", role: user.role });
+//     }
+//   );
+// });
 
 
 const storage = multer.diskStorage({
