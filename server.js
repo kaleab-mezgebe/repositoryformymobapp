@@ -15,44 +15,24 @@ const moment = require("moment");
 require("dotenv").config();
 const PORT = process.env.PORT || 3000;
 
+const pool = mysql.createPool({
+  connectionLimit: 10,
+  host: connectionConfig.host,
+  user: connectionConfig.user,
+  password: connectionConfig.password,
+  database: connectionConfig.database,
+});
 
-const connectionConfig = {
-  host: "sql7.freesqldatabase.com",
-  user: "sql7727012",
-  password: "LELVmWl2pf",
-  database: "sql7727012",
-};
-
-let connection;
-
-function handleDisconnect() {
-  connection = mysql.createConnection(connectionConfig);
-
-  connection.connect((err) => {
-    if (err) {
-      console.error("Error connecting to MySQL: ", err);
-      setTimeout(handleDisconnect, 2000); // Try to reconnect after 2 seconds
-    } else {
-      console.log("Connected to MySQL");
-
-      connection.on("error", (err) => {
-        if (err.code === "PROTOCOL_CONNECTION_LOST") {
-          // Connection to the MySQL server is usually lost due to either server timeout or transient
-          // network issues. The following tries to reconnect with a backoff strategy to
-          // avoid flooding the server with reconnects at the cost of slightly longer
-          // downtime for users.
-          console.error("MySQL connection lost, reconnecting...", err);
-          setTimeout(handleDisconnect, 2000);
-        } else {
-          console.error("MySQL error: ", err);
-          throw err;
-        }
-      });
-    }
-  });
-}
-
-handleDisconnect();
+pool.getConnection((err, connection) => {
+  if (err) {
+    console.error("Error acquiring connection: ", err);
+    return;
+  }
+  console.log("Connected to MySQL");
+  
+  // Use connection here
+  connection.release(); // Release the connection back to the pool
+});
 
 app.use(express.json());
 
@@ -61,7 +41,7 @@ app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
   // Query the database to find the user with the provided username.
-  connection.query(
+  pool.query(
     "SELECT role, password FROM user WHERE username = ?",
     [username],
     (err, results) => {
