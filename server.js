@@ -1,7 +1,5 @@
 
 
-
-
 const express = require("express");
 const mysql = require("mysql");
 const bodyParser = require("body-parser");
@@ -123,7 +121,7 @@ app.post(
     console.log("Received data from the frontend:", req.body);
 
     // Check if there's already a row with the given username in the admins table
-    connection.query(
+    pool.query(
       "SELECT * FROM user WHERE username = ?",
       [username],
       function (err, results) {
@@ -150,7 +148,7 @@ app.post(
              )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-          connection.query(
+          pool.query(
             sql,
             [
               username,
@@ -208,7 +206,7 @@ app.post(
     console.log("Received data from the frontend:", req.body);
 
     // Check if there's already a row with the given username in the admins table
-    connection.query(
+    pool.query(
       "SELECT * FROM user WHERE username = ?",
       [username],
       function (err, results) {
@@ -237,7 +235,7 @@ app.post(
              )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)`;
 
-          connection.query(
+          pool.query(
             sql,
             [
               username,
@@ -261,7 +259,7 @@ app.post(
                 // Insert into report table
                 const queryInsertReport =
                   "INSERT INTO report (first_name,last_name,datacollector) VALUES (?,?,?)";
-                connection.query(
+                pool.query(
                   queryInsertReport,
                   [firstName, lastName, username],
                   function (err, results) {
@@ -304,7 +302,7 @@ app.post(
 //     console.log("Received data from the frontend:", req.body);
 
 //     // Check if there's already a row with the given username in the admins table
-//     connection.query(
+//     pool.query(
 //       "SELECT * FROM user WHERE username = ?",
 //       [username],
 //       function (err, results) {
@@ -333,7 +331,7 @@ app.post(
 //              )
 //             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)`;
 
-//           connection.query(
+//           pool.query(
 //             sql,
 //             [
 //               username,
@@ -358,7 +356,7 @@ app.post(
 //                 // Insert into report table
 //                 const queryInsertReport =
 //                   "INSERT INTO report (first_name,last_name,datacollector) VALUES (?,?,?)";
-//                 connection.query(
+//                 pool.query(
 //                   queryInsertReport,
 //                   [firstName, lastName, username],
 //                   function (err, results) {
@@ -378,7 +376,7 @@ app.delete("/deleteAdmin/:id", (req, res) => {
   const id = req.params.id;
 
   const query = "DELETE FROM user WHERE id = ?";
-  connection.query(query, [id], (err, results) => {
+  pool.query(query, [id], (err, results) => {
     if (err) {
       res.status(500).send(err);
     } else {
@@ -390,7 +388,7 @@ app.delete("/deleteAdmin/:id", (req, res) => {
 // 4.Get Details Admin and Data Collector
 app.get("/updatedatacollector/:id", (req, res) => {
   const userId = req.params.id;
-  connection.query(
+  pool.query(
     "SELECT * FROM user WHERE id = ?",
     [userId],
     (error, results, fields) => {
@@ -407,7 +405,7 @@ app.get("/updatedatacollector/:id", (req, res) => {
 // 4.1 Get Details Data Collector
 app.get("/updatedatacollectorr/:username", (req, res) => {
   const username = req.params.username;
-  connection.query(
+  pool.query(
     "SELECT * FROM user WHERE username = ?",
     [username],
     (error, results, fields) => {
@@ -433,7 +431,7 @@ app.put("/updatedatacollector/:id", (req, res) => {
     // role,
     password,
   } = req.body;
-  connection.query(
+  pool.query(
     "UPDATE user SET first_name = ?, last_name = ?, gender = ?, email = ?, phone_number = ?, position = ?, password = ? WHERE id = ?",
     [
       first_name,
@@ -470,7 +468,7 @@ app.put("/updatedatacollectorr/:username/:updatedby", (req, res) => {
     position,
     password,
   } = req.body;
-  connection.query(
+  pool.query(
     "UPDATE user SET first_name = ?, last_name = ?, gender = ?, email = ?, phone_number = ?, position = ?, password = ? WHERE username = ?",
     [
       first_name,
@@ -494,7 +492,7 @@ app.put("/updatedatacollectorr/:username/:updatedby", (req, res) => {
 
   const queryUpdateReport =
     "UPDATE report SET updated_by = ?, updated_on = NOW() WHERE datacollector = ?";
-  connection.query(queryUpdateReport, [updatedby, username], (err, results) => {
+  pool.query(queryUpdateReport, [updatedby, username], (err, results) => {
     // You can handle any error here if you need to
   });
 });
@@ -502,7 +500,7 @@ app.put("/updatedatacollectorr/:username/:updatedby", (req, res) => {
 // 6.Getting Details of  My Profile of Admin,Data Collector and Core Admin
 app.get("/updateMyprofile/:username", (req, res) => {
   const userName = req.params.username;
-  connection.query(
+  pool.query(
     "SELECT * FROM user WHERE username = ?",
     [userName],
     (error, results, fields) => {
@@ -528,7 +526,7 @@ app.put("/updateMyprofile/:username", (req, res) => {
     role,
     password,
   } = req.body;
-  connection.query(
+  pool.query(
     "UPDATE user SET first_name = ?, last_name = ?, gender = ?, email = ?, phone_number = ?, position = ?, role = ?, password = ? WHERE username = ?",
     [
       first_name,
@@ -555,8 +553,8 @@ app.put("/updateMyprofile/:username", (req, res) => {
 //8. Getting Data of Admin
 app.get("/GetAdmins", (req, res) => {
   const username = req.query.username;
-  const query = `SELECT * FROM user WHERE role='Admin'`;
-  connection.query(query, (err, results) => {
+  const query = `SELECT * FROM user WHERE role='ኣድሚን'`;
+  pool.query(query, (err, results) => {
     if (err) {
       console.error("Error retrieving data:", err);
       res.status(500).json({ error: "Error retrieving data" });
@@ -571,7 +569,7 @@ app.get("/getEachAdmin", (req, res) => {
   const id = req.query.id; // Use id instead of username
   const query = `SELECT * FROM user WHERE id='${id}'`;
 
-  connection.query(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
       console.error("Error retrieving data:", err);
       res.status(500).json({ error: "Error retrieving data" });
@@ -597,7 +595,7 @@ app.get("/getEachAdmin", (req, res) => {
 //   const username = req.params.username;
 
 //   const query = "DELETE FROM user WHERE username = ?";
-//   connection.query(query, [username], (err, results) => {
+//   pool.query(query, [username], (err, results) => {
 //     if (err) {
 //       res.status(500).send(err);
 //     } else {
@@ -614,7 +612,7 @@ app.delete("/deleteDataCollector/:username/:deletedby", (req, res) => {
   const deletedby = req.params.deletedby;
 
   const queryDeleteUser = "DELETE FROM user WHERE username = ?";
-  connection.query(queryDeleteUser, [username], (err, results) => {
+  pool.query(queryDeleteUser, [username], (err, results) => {
     if (err) {
       res.status(500).send(err);
     } else {
@@ -624,7 +622,7 @@ app.delete("/deleteDataCollector/:username/:deletedby", (req, res) => {
 
   const queryUpdateReport =
     "UPDATE report SET deletedby = ?, deleted_on = NOW() WHERE datacollector = ?";
-  connection.query(queryUpdateReport, [deletedby, username], (err, results) => {
+  pool.query(queryUpdateReport, [deletedby, username], (err, results) => {
     // You can handle any error here if you need to
   });
 });
@@ -643,7 +641,7 @@ app.delete("/deleteDataCollector/:username/:deletedby", (req, res) => {
 //   var currentDateAndTime = now.format("YYYY-MM-DD HH:mm:ss");
 
 //   const query = `DELETE FROM user WHERE id = ?; UPDATE report SET deleted_by = ? , deleted_on = ? WHERE datacollector= ?`;
-//   connection.query(
+//   pool.query(
 //     query,
 //     [id, username, currentDateAndTime, datacollector],
 //     (err, results) => {
@@ -660,7 +658,7 @@ app.delete("/deleteDataCollector/:username/:deletedby", (req, res) => {
 app.get("/GetDatacollector", (req, res) => {
   const username = req.query.username; // Use id instead of username
   const query = `SELECT * FROM user WHERE created_by='${username}'`;
-  connection.query(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
       console.error("Error retrieving data:", err);
       res.status(500).json({ error: "Error retrieving data" });
@@ -674,8 +672,8 @@ app.get("/GetDatacollector", (req, res) => {
 //11. Retrieving Data Collectors
 app.get("/GetDatacollectorr", (req, res) => {
   const username = req.query.username; // Use id instead of username
-  const query = `SELECT * FROM user WHERE role='Data Collector'`;
-  connection.query(query, (err, results) => {
+  const query = `SELECT * FROM user WHERE role='መረዳእታ ኣካቢ'`;
+  pool.query(query, (err, results) => {
     if (err) {
       console.error("Error retrieving data:", err);
       res.status(500).json({ error: "Error retrieving data" });
@@ -689,7 +687,7 @@ app.get("/GetDatacollectorr", (req, res) => {
 //   const id = req.query.id; // Use id instead of username
 //   const query = `SELECT * FROM user WHERE id='${id}'`;
 
-//   connection.query(query, (err, results) => {
+//   pool.query(query, (err, results) => {
 //     if (err) {
 //       console.error("Error retrieving data:", err);
 //       res.status(500).json({ error: "Error retrieving data" });
@@ -705,7 +703,7 @@ app.get("/getEacDataCollector", (req, res) => {
   const id = req.query.id; // Use id instead of username
   const query = `SELECT * FROM user WHERE id='${id}'`;
 
-  connection.query(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
       console.error("Error retrieving data:", err);
       res.status(500).json({ error: "Error retrieving data" });
@@ -729,7 +727,7 @@ app.get("/getEacDataCollectorr", (req, res) => {
   const username = req.query.username; // Use id instead of username
   const query = `SELECT * FROM user WHERE username='${username}'`;
 
-  connection.query(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
       console.error("Error retrieving data:", err);
       res.status(500).json({ error: "Error retrieving data" });
@@ -755,7 +753,7 @@ app.get("/report", (req, res) => {
   const username = req.query.username; // Use id instead of username
   const query = `SELECT * FROM report WHERE datacollector='${username}'`;
 
-  connection.query(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
       console.error("Error retrieving data:", err);
       res.status(500).json({ error: "Error retrieving data" });
@@ -782,7 +780,7 @@ app.get("/reportt", (req, res) => {
   // Use id instead of username
   const query = `SELECT * FROM report`;
 
-  connection.query(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
       console.error("Error retrieving data:", err);
       res.status(500).json({ error: "Error retrieving data" });
@@ -797,7 +795,7 @@ app.delete("/movableData/:id", (req, res) => {
   const id = req.params.id;
 
   const query = "DELETE FROM movable_data WHERE id = ?";
-  connection.query(query, [id], (err, results) => {
+  pool.query(query, [id], (err, results) => {
     if (err) {
       res.status(500).send(err);
     } else {
@@ -810,9 +808,10 @@ app.delete("/movableData/:id", (req, res) => {
 app.delete("/deleteNonMovableData/:id", (req, res) => {
   const id = req.params.id;
   const query = "DELETE FROM non_movable_heritage_data WHERE id = ?";
-  connection.query(query, [id], (err, results) => {
+  pool.query(query, [id], (err, results) => {
     if (err) {
       res.status(500).send(err);
+      
     } else {
       res.status(200).json({ message: "Item deleted successfully" });
     }
@@ -1084,7 +1083,7 @@ app.post(
       )
   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
 
-    connection.query(
+    pool.query(
       sql,
       [
         usernameValue,
@@ -1435,7 +1434,7 @@ app.post(
       )
   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
 
-    connection.query(
+    pool.query(
       sql,
       [
         usernameValue,
@@ -1539,7 +1538,7 @@ app.post(
 //17. Get Movable Data
 app.get("/getMovableData/:id", (req, res) => {
   const userId = req.params.id;
-  connection.query(
+  pool.query(
     "SELECT * FROM movable_data WHERE id = ?",
     [userId],
     (error, results, fields) => {
@@ -1556,7 +1555,7 @@ app.get("/getMovableData/:id", (req, res) => {
 //17. Get Movable Data
 app.get("/getNonMovableData/:id", (req, res) => {
   const userId = req.params.id;
-  connection.query(
+  pool.query(
     "SELECT * FROM non_movable_heritage_data WHERE id = ?",
     [userId],
     (error, results, fields) => {
@@ -1574,7 +1573,7 @@ app.get("/movableDatas/:heritageId", (req, res) => {
   const heritageId = req.params.heritageId;
   const query = `SELECT * FROM movable_data WHERE id = ${heritageId}`;
   console.log("Query:", query);
-  connection.query(query, (err, rows) => {
+  pool.query(query, (err, rows) => {
     console.log("Rows:", rows);
     if (err) {
       console.error("error running query:", err);
@@ -1589,7 +1588,7 @@ app.get("/movableDatas/:heritageId", (req, res) => {
 app.get("/getMovableLists/:username", (req, res) => {
   const username = req.params.username;
   const query = `SELECT id,heritage_name FROM movable_data WHERE username_of_data_collector = ?`;
-  connection.query(query, [username], (error, results, fields) => {
+  pool.query(query, [username], (error, results, fields) => {
     if (error) {
       console.error(error);
       res.status(500).send("Error fetching user information");
@@ -1690,7 +1689,7 @@ app.put("/updateheritage/:id", (req, res) => {
     position,
     registration_date_of_heritage,
   } = req.body;
-  connection.query(
+  pool.query(
     `UPDATE movable_data
     SET 
     caption_for_image_of_heritage=?,
@@ -1874,7 +1873,7 @@ app.put("/messageToDatacollectorMov/:id", (req, res) => {
   console.log("Message from Admin:", messageFromAdmin);
 
   const query = "UPDATE movable_data SET Message_from_Admin = ? WHERE id = ?";
-  connection.query(query, [messageFromAdmin, id], (err, result) => {
+  pool.query(query, [messageFromAdmin, id], (err, result) => {
     if (err) {
       console.error("Error updating data: ", err);
       return res.status(500).json({ error: "Error updating data" });
@@ -1898,7 +1897,7 @@ app.put("/messageToDatacollectorNonMov/:id", (req, res) => {
 
   const query =
     "UPDATE non_movable_heritage_data SET Message_from_Admin = ? WHERE id = ?";
-  connection.query(query, [messageFromAdmin, id], (err, result) => {
+  pool.query(query, [messageFromAdmin, id], (err, result) => {
     if (err) {
       console.error("Error updating data: ", err);
       return res.status(500).json({ error: "Error updating data" });
@@ -1921,7 +1920,7 @@ app.put("/messageToAdminMov/:id", (req, res) => {
   console.log("Message To Admin:", messageToAdmin);
 
   const query = "UPDATE movable_data SET Message_To_Admin = ? WHERE id = ?";
-  connection.query(query, [messageToAdmin, id], (err, result) => {
+  pool.query(query, [messageToAdmin, id], (err, result) => {
     if (err) {
       console.error("Error updating data: ", err);
       return res.status(500).json({ error: "Error updating data" });
@@ -1945,7 +1944,7 @@ app.put("/messageToAdminNonMov/:id", (req, res) => {
 
   const query =
     "UPDATE non_movable_heritage_data SET Message_To_Admin = ? WHERE id = ?";
-  connection.query(query, [messageToAdmin, id], (err, result) => {
+  pool.query(query, [messageToAdmin, id], (err, result) => {
     if (err) {
       console.error("Error updating data: ", err);
       return res.status(500).json({ error: "Error updating data" });
@@ -1961,7 +1960,7 @@ app.put("/messageToAdminNonMov/:id", (req, res) => {
 //20. Get Non Movable Data in updating Non Movable Data
 app.get("/fetchNonMovableData/:id", (req, res) => {
   const userId = req.params.id;
-  connection.query(
+  pool.query(
     "SELECT * FROM non_movable_heritage_data WHERE id = ?",
     [userId],
     (error, results, fields) => {
@@ -2064,7 +2063,7 @@ app.put("/updateNonMovableHeritage/:id", (req, res) => {
     position,
     registration_date_of_heritage,
   } = req.body;
-  connection.query(
+  pool.query(
     `UPDATE non_movable_heritage_data
     SET 
     username_of_data_collector= ?,
@@ -2251,7 +2250,7 @@ WHERE id = ?`,
 //   const id = req.query.id; // Use id instead of username
 //   const query = `SELECT * FROM movable_data WHERE id='${id}'`;
 
-//   connection.query(query, (err, results) => {
+//   pool.query(query, (err, results) => {
 //     if (err) {
 //       console.error("Error retrieving data:", err);
 //       res.status(500).json({ error: "Error retrieving data" });
@@ -2265,7 +2264,7 @@ app.get("/getMovableDataa", (req, res) => {
   const id = req.query.id; // Use id instead of username
   const query = `SELECT * FROM movable_data WHERE id='${id}'`;
 
-  connection.query(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
       console.error("Error retrieving data:", err);
       res.status(500).json({ error: "Error retrieving data" });
@@ -2369,7 +2368,7 @@ app.get("/getMovableDataaa", (req, res) => {
   const id = req.query.id; // Use id instead of username
   const query = `SELECT * FROM movable_data WHERE id='${id}'`;
 
-  connection.query(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
       console.error("Error retrieving data:", err);
       res.status(500).json({ error: "Error retrieving data" });
@@ -2382,7 +2381,7 @@ app.get("/getNonMovableDataaa", (req, res) => {
   const id = req.query.id; // Use id instead of username
   const query = `SELECT * FROM non_movable_heritage_data WHERE id='${id}'`;
 
-  connection.query(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
       console.error("Error retrieving data:", err);
       res.status(500).json({ error: "Error retrieving data" });
@@ -2396,7 +2395,7 @@ app.get("/getNonMovableDataaa", (req, res) => {
 //   const id = req.query.id; // Use id instead of username
 //   const query = `SELECT * FROM non_movable_heritage_data WHERE id='${id}'`;
 
-//   connection.query(query, (err, results) => {
+//   pool.query(query, (err, results) => {
 //     if (err) {
 //       console.error("Error retrieving data:", err);
 //       res.status(500).json({ error: "Error retrieving data" });
@@ -2411,7 +2410,7 @@ app.get("/getnonMovableDataa", (req, res) => {
   const id = req.query.id; // Use id instead of username
   const query = `SELECT * FROM non_movable_heritage_data WHERE id='${id}'`;
 
-  connection.query(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
       console.error("Error retrieving data:", err);
       res.status(500).json({ error: "Error retrieving data" });
@@ -2528,7 +2527,7 @@ app.get("/getnonMovableDataa", (req, res) => {
 app.get("/movableData", (req, res) => {
   const username = req.query.username;
   const query = `SELECT * FROM movable_data WHERE 	username_of_data_collector='${username}'`;
-  connection.query(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
       console.error(
         "Error retrieving data:",
@@ -2548,7 +2547,7 @@ app.get("/movableData", (req, res) => {
 app.get("/movableDataCoreAdmin", (req, res) => {
   const username = req.query.username;
   const query = `SELECT * FROM movable_data`;
-  connection.query(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
       console.error(
         "Error retrieving data:",
@@ -2564,7 +2563,7 @@ app.get("/movableDataCoreAdmin", (req, res) => {
 // 24.View My Profile/Core Admin,Data Collector and  Data Collector
 app.get("/get-profile", (req, res) => {
   const username = req.query.username;
-  connection.query(
+  pool.query(
     `SELECT username,password, first_name, last_name, gender, email, phone_number, position, role 
     FROM user WHERE username = '${username}'`,
     (err, results) => {
@@ -2599,7 +2598,7 @@ app.get("/get-profile", (req, res) => {
 app.get("/gettingNonMovableData", (req, res) => {
   const username = req.query.username;
   const query = `SELECT * FROM non_movable_heritage_data WHERE 	username_of_data_collector='${username}'`;
-  connection.query(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
       console.error("Error retrieving data:", err);
       res.status(500).json({ error: "Error retrieving data" });
@@ -2615,7 +2614,7 @@ app.get("/gettingNonMovableData", (req, res) => {
 app.get("/gettNonMovableData", (req, res) => {
   const username = req.query.username;
   const query = `SELECT * FROM non_movable_heritage_data`;
-  connection.query(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
       console.error("Error retrieving data:", err);
       res.status(500).json({ error: "Error retrieving data" });
@@ -2626,7 +2625,7 @@ app.get("/gettNonMovableData", (req, res) => {
 });
 app.post("/confirm", (req, res) => {
   const id = req.body.id;
-  connection.query(
+  pool.query(
     `UPDATE movable_data SET confirmed = 1 WHERE id = ?`,
     [id],
     (err, results) => {
@@ -2643,7 +2642,7 @@ app.post("/confirm", (req, res) => {
 // API to get confirmed status of movable data
 app.get("/confirmed/:id", (req, res) => {
   const id = req.params.id;
-  connection.query(
+  pool.query(
     `SELECT * FROM movable_data WHERE id = ?`,
     [id],
     (err, results) => {
@@ -2664,7 +2663,7 @@ app.get("/confirmed/:id", (req, res) => {
 app.put("/api/sendMessage", (req, res) => {
   const { id, message } = req.body;
 
-  connection.query(
+  pool.query(
     `UPDATE movable_data SET Message_From_Admin = ? WHERE id = ?`,
     [message, id],
     (error, results) => {
@@ -2701,7 +2700,7 @@ app.put("/api/sendMessage", (req, res) => {
 //       )
 //   VALUES (?)`;
 
-//     connection.query(sql, [imagePaths], function (err, result) {
+//     pool.query(sql, [imagePaths], function (err, result) {
 //       if (err) {
 //         console.error("Error registering user: ", err);
 //         res.status(500).send("Error registering user");
@@ -2717,7 +2716,7 @@ const path = require("path"); // Add this line
 // app.get("/image/:id", (req, res) => {
 //   const id = req.params.id;
 //   const query = `SELECT path FROM image WHERE id = ${id}`;
-//   connection.query(query, (err, rows) => {
+//   pool.query(query, (err, rows) => {
 //     if (err) {
 //       console.error("error fetching image:", err);
 //       res.status(500).send({ message: "Error fetching image" });
@@ -2732,7 +2731,7 @@ const path = require("path"); // Add this line
 // app.get("/image/:id", (req, res) => {
 //   const id = req.params.id;
 //   const query = `SELECT path FROM image WHERE id = ${id}`;
-//   connection.query(query, (err, rows) => {
+//   pool.query(query, (err, rows) => {
 //     if (err) {
 //       console.error("error fetching image:", err);
 //       res.status(500).send({ message: "Error fetching image" });
@@ -2767,7 +2766,7 @@ const path = require("path"); // Add this line
 //   // Update the existing images in the database
 //   const updateQuery =
 //     "UPDATE heritage_images SET image_path = ? WHERE image_path IN (?)";
-//   connection.query(
+//   pool.query(
 //     updateQuery,
 //     [newImagePaths, existingImagePaths],
 //     (err, result) => {
@@ -2779,7 +2778,7 @@ const path = require("path"); // Add this line
 //       // Insert new images into the database
 //       const insertQuery = "INSERT INTO heritage_images (image_path) VALUES ?";
 //       const newImageValues = newImagePaths.map((path) => [path]);
-//       connection.query(insertQuery, [newImageValues], (err, result) => {
+//       pool.query(insertQuery, [newImageValues], (err, result) => {
 //         if (err) {
 //           console.error("Error inserting images:", err);
 //           return res.status(500).json({ error: "Error inserting images" });
@@ -2797,7 +2796,7 @@ app.get("/api/images", (req, res) => {
   const id = req.query.id; // Retrieve the id from the query parameters
 
   const query = `SELECT image_of_heritage FROM movable_data WHERE id = ?`; // Use the id parameter in the query
-  connection.query(query, [id], (err, result) => {
+  pool.query(query, [id], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send("Error fetching image paths");
@@ -2831,7 +2830,7 @@ app.delete("/api/images/:filename", (req, res) => {
   const imagePath = path.join(__dirname, "uploads", filename);
   const query = `SELECT image_of_heritage FROM movable_data WHERE id = ?`; // Use the id parameter in the query
 
-  connection.query(query, [id], (err, result) => {
+  pool.query(query, [id], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send("Error fetching image paths");
@@ -2842,7 +2841,7 @@ app.delete("/api/images/:filename", (req, res) => {
       const updatedPaths = imagePaths.join(",");
 
       const updateQuery = `UPDATE movable_data SET image_of_heritage = ? WHERE id = ?`; // Use the id parameter in the update query
-      connection.query(updateQuery, [updatedPaths, id], (err, updateResult) => {
+      pool.query(updateQuery, [updatedPaths, id], (err, updateResult) => {
         if (err) {
           console.error(err);
           return res.status(500).send("Error updating image paths");
@@ -2877,7 +2876,7 @@ app.put(
       WHERE id = ?
     `;
 
-    connection.query(sql, [id], (err, result) => {
+    pool.query(sql, [id], (err, result) => {
       if (err) {
         console.error("Error retrieving existing image path: ", err);
         res.status(500).send("Error updating image");
@@ -2893,7 +2892,7 @@ app.put(
           WHERE id = ?
         `;
 
-        connection.query(updateSql, [newPaths, id], (err, result) => {
+        pool.query(updateSql, [newPaths, id], (err, result) => {
           if (err) {
             console.error("Error updating image: ", err);
             res.status(500).send("Error updating image");
@@ -2912,7 +2911,7 @@ app.get("/api/nonMovimages", (req, res) => {
   const id = req.query.id; // Retrieve the id from the query parameters
 
   const query = `SELECT image_of_heritage FROM non_movable_heritage_data WHERE id = ?`; // Use the id parameter in the query
-  connection.query(query, [id], (err, result) => {
+  pool.query(query, [id], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send("Error fetching image paths");
@@ -2945,7 +2944,7 @@ app.delete("/api/nonMovimages/:filename", (req, res) => {
   const imagePath = path.join(__dirname, "uploads", filename);
   const query = `SELECT image_of_heritage FROM non_movable_heritage_data WHERE id = ?`; // Use the id parameter in the query
 
-  connection.query(query, [id], (err, result) => {
+  pool.query(query, [id], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send("Error fetching image paths");
@@ -2956,7 +2955,7 @@ app.delete("/api/nonMovimages/:filename", (req, res) => {
       const updatedPaths = imagePaths.join(",");
 
       const updateQuery = `UPDATE non_movable_heritage_data SET image_of_heritage = ? WHERE id = ?`; // Use the id parameter in the update query
-      connection.query(updateQuery, [updatedPaths, id], (err, updateResult) => {
+      pool.query(updateQuery, [updatedPaths, id], (err, updateResult) => {
         if (err) {
           console.error(err);
           return res.status(500).send("Error updating image paths");
@@ -2991,7 +2990,7 @@ app.put(
       WHERE id = ?
     `;
 
-    connection.query(sql, [id], (err, result) => {
+    pool.query(sql, [id], (err, result) => {
       if (err) {
         console.error("Error retrieving existing image path: ", err);
         res.status(500).send("Error updating image");
@@ -3007,7 +3006,7 @@ app.put(
           WHERE id = ?
         `;
 
-        connection.query(updateSql, [newPaths, id], (err, result) => {
+        pool.query(updateSql, [newPaths, id], (err, result) => {
           if (err) {
             console.error("Error updating image: ", err);
             res.status(500).send("Error updating image");
@@ -3026,7 +3025,7 @@ app.get("/api/imagesNonMovSignature", (req, res) => {
   const id = req.query.id; // Retrieve the id from the query parameters
 
   const query = `SELECT descriptive_image_of_heritage FROM non_movable_heritage_data WHERE id = ?`; // Use the id parameter in the query
-  connection.query(query, [id], (err, result) => {
+  pool.query(query, [id], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send("Error fetching image paths");
@@ -3048,7 +3047,7 @@ app.delete("/api/imagesNonMovSignature/:filename", (req, res) => {
   const imagePath = path.join(__dirname, "uploads", filename);
   const query = `SELECT descriptive_image_of_heritage FROM non_movable_heritage_data WHERE id = ?`; // Use the id parameter in the query
 
-  connection.query(query, [id], (err, result) => {
+  pool.query(query, [id], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send("Error fetching image paths");
@@ -3059,7 +3058,7 @@ app.delete("/api/imagesNonMovSignature/:filename", (req, res) => {
       const updatedPaths = imagePaths.join(",");
 
       const updateQuery = `UPDATE non_movable_heritage_data SET descriptive_image_of_heritage = ? WHERE id = ?`; // Use the id parameter in the update query
-      connection.query(updateQuery, [updatedPaths, id], (err, updateResult) => {
+      pool.query(updateQuery, [updatedPaths, id], (err, updateResult) => {
         if (err) {
           console.error(err);
           return res.status(500).send("Error updating image paths");
@@ -3094,7 +3093,7 @@ app.put(
       WHERE id = ?
     `;
 
-    connection.query(sql, [id], (err, result) => {
+    pool.query(sql, [id], (err, result) => {
       if (err) {
         console.error("Error retrieving existing image path: ", err);
         res.status(500).send("Error updating image");
@@ -3110,7 +3109,7 @@ app.put(
           WHERE id = ?
         `;
 
-        connection.query(updateSql, [newPaths, id], (err, result) => {
+        pool.query(updateSql, [newPaths, id], (err, result) => {
           if (err) {
             console.error("Error updating image: ", err);
             res.status(500).send("Error updating image");
@@ -3129,7 +3128,7 @@ app.get("/api/imagesMovSignature", (req, res) => {
   const id = req.query.id; // Retrieve the id from the query parameters
 
   const query = `SELECT descriptive_image_of_heritage FROM movable_data WHERE id = ?`; // Use the id parameter in the query
-  connection.query(query, [id], (err, result) => {
+  pool.query(query, [id], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send("Error fetching image paths");
@@ -3151,7 +3150,7 @@ app.delete("/api/imagesMovSignature/:filename", (req, res) => {
   const imagePath = path.join(__dirname, "uploads", filename);
   const query = `SELECT descriptive_image_of_heritage FROM movable_data WHERE id = ?`; // Use the id parameter in the query
 
-  connection.query(query, [id], (err, result) => {
+  pool.query(query, [id], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send("Error fetching image paths");
@@ -3162,7 +3161,7 @@ app.delete("/api/imagesMovSignature/:filename", (req, res) => {
       const updatedPaths = imagePaths.join(",");
 
       const updateQuery = `UPDATE movable_data SET descriptive_image_of_heritage = ? WHERE id = ?`; // Use the id parameter in the update query
-      connection.query(updateQuery, [updatedPaths, id], (err, updateResult) => {
+      pool.query(updateQuery, [updatedPaths, id], (err, updateResult) => {
         if (err) {
           console.error(err);
           return res.status(500).send("Error updating image paths");
@@ -3197,7 +3196,7 @@ app.put(
       WHERE id = ?
     `;
 
-    connection.query(sql, [id], (err, result) => {
+    pool.query(sql, [id], (err, result) => {
       if (err) {
         console.error("Error retrieving existing image path: ", err);
         res.status(500).send("Error updating image");
@@ -3213,7 +3212,7 @@ app.put(
           WHERE id = ?
         `;
 
-        connection.query(updateSql, [newPaths, id], (err, result) => {
+        pool.query(updateSql, [newPaths, id], (err, result) => {
           if (err) {
             console.error("Error updating image: ", err);
             res.status(500).send("Error updating image");
@@ -3232,7 +3231,7 @@ app.get("/api/imagesKeeperSignature", (req, res) => {
   const id = req.query.id; // Retrieve the id from the query parameters
 
   const query = `SELECT keeper_signature_image FROM non_movable_heritage_data WHERE id = ?`; // Use the id parameter in the query
-  connection.query(query, [id], (err, result) => {
+  pool.query(query, [id], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send("Error fetching image paths");
@@ -3254,7 +3253,7 @@ app.delete("/api/imagesKeeperSignature/:filename", (req, res) => {
   const imagePath = path.join(__dirname, "uploads", filename);
   const query = `SELECT keeper_signature_image FROM non_movable_heritage_data WHERE id = ?`; // Use the id parameter in the query
 
-  connection.query(query, [id], (err, result) => {
+  pool.query(query, [id], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send("Error fetching image paths");
@@ -3265,7 +3264,7 @@ app.delete("/api/imagesKeeperSignature/:filename", (req, res) => {
       const updatedPaths = imagePaths.join(",");
 
       const updateQuery = `UPDATE non_movable_heritage_data SET keeper_signature_image = ? WHERE id = ?`; // Use the id parameter in the update query
-      connection.query(updateQuery, [updatedPaths, id], (err, updateResult) => {
+      pool.query(updateQuery, [updatedPaths, id], (err, updateResult) => {
         if (err) {
           console.error(err);
           return res.status(500).send("Error updating image paths");
@@ -3300,7 +3299,7 @@ app.put(
       WHERE id = ?
     `;
 
-    connection.query(sql, [id], (err, result) => {
+    pool.query(sql, [id], (err, result) => {
       if (err) {
         console.error("Error retrieving existing image path: ", err);
         res.status(500).send("Error updating image");
@@ -3316,7 +3315,7 @@ app.put(
           WHERE id = ?
         `;
 
-        connection.query(updateSql, [newPaths, id], (err, result) => {
+        pool.query(updateSql, [newPaths, id], (err, result) => {
           if (err) {
             console.error("Error updating image: ", err);
             res.status(500).send("Error updating image");
@@ -3331,7 +3330,7 @@ app.put(
 );
 app.put("/update-seen-data-collector/:id", (req, res) => {
   const id = req.params.id;
-  connection.query(
+  pool.query(
     `UPDATE movable_data SET seen_datacollector_message = 0 WHERE id = ${id}`,
     (err, results) => {
       if (err) {
@@ -3346,7 +3345,7 @@ app.put("/update-seen-data-collector/:id", (req, res) => {
 
 app.put("/update-seen-admin_message/:id", (req, res) => {
   const id = req.params.id;
-  connection.query(
+  pool.query(
     `UPDATE movable_data SET seen_adimin_message = 0 WHERE id = ${id}`,
     (err, results) => {
       if (err) {
@@ -3361,7 +3360,7 @@ app.put("/update-seen-admin_message/:id", (req, res) => {
 
 app.put("/update-unseen-data-collector/:id", (req, res) => {
   const id = req.params.id;
-  connection.query(
+  pool.query(
     `UPDATE movable_data SET seen_datacollector_message = 1 WHERE id = ${id}`,
     (err, results) => {
       if (err) {
@@ -3377,7 +3376,7 @@ app.put("/update-unseen-data-collector/:id", (req, res) => {
 app.put("/update-seen-admin/:id", (req, res) => {
   const id = req.params.id;
   const { seen_datacollector_message } = req.body;
-  connection.query(
+  pool.query(
     `UPDATE movable_data SET seen_adimin_message = ? WHERE id = ?`,
     [seen_datacollector_message, id],
     (err, results) => {
@@ -3395,7 +3394,7 @@ app.put("/update-seen-admin/:id", (req, res) => {
 
 app.put("/update-seen-data-collector-non-mov/:id", (req, res) => {
   const id = req.params.id;
-  connection.query(
+  pool.query(
     `UPDATE non_movable_heritage_data SET seen_datacollector_message = 0 WHERE id = ${id}`,
     (err, results) => {
       if (err) {
@@ -3410,7 +3409,7 @@ app.put("/update-seen-data-collector-non-mov/:id", (req, res) => {
 
 app.put("/update-seen-admin_message-non-mov/:id", (req, res) => {
   const id = req.params.id;
-  connection.query(
+  pool.query(
     `UPDATE non_movable_heritage_data SET seen_adimin_message = 0 WHERE id = ${id}`,
     (err, results) => {
       if (err) {
@@ -3425,7 +3424,7 @@ app.put("/update-seen-admin_message-non-mov/:id", (req, res) => {
 
 app.put("/update-unseen-data-collector-non-mov/:id", (req, res) => {
   const id = req.params.id;
-  connection.query(
+  pool.query(
     `UPDATE non_movable_heritage_data SET seen_datacollector_message = 1 WHERE id = ${id}`,
     (err, results) => {
       if (err) {
@@ -3441,7 +3440,7 @@ app.put("/update-unseen-data-collector-non-mov/:id", (req, res) => {
 app.put("/update-seen-admin-non-mov/:id", (req, res) => {
   const id = req.params.id;
   const { seen_datacollector_message } = req.body;
-  connection.query(
+  pool.query(
     `UPDATE non_movable_heritage_data SET seen_adimin_message = ? WHERE id = ?`,
     [seen_datacollector_message, id],
     (err, results) => {
@@ -3459,7 +3458,7 @@ app.put("/update-seen-admin-non-mov/:id", (req, res) => {
 //   const { name, email, phone } = req.body;
 
 //   const query = "INSERT INTO users (firstName, email, phone) VALUES (?, ?, ?)";
-//   connection.query(query, [name, email, phone], (err, result) => {
+//   pool.query(query, [name, email, phone], (err, result) => {
 //     if (err) {
 //       console.error("Error saving user data: ", err);
 //       res.status(500).json({ error: "Error saving user data" });
@@ -3473,7 +3472,7 @@ app.put("/update-seen-admin-non-mov/:id", (req, res) => {
 //   const { name, email, phone } = req.body;
 
 //   const query = "INSERT INTO users (firstName, email, phone) VALUES (?, ?, ?)";
-//   connection.query(query, [name, email, phone], (err, result) => {
+//   pool.query(query, [name, email, phone], (err, result) => {
 //     if (err) {
 //       console.error("Error saving user data: ", err);
 //       res.status(500).json({ error: "Error saving user data" });
@@ -3488,7 +3487,7 @@ app.get("/getGalleryImages", (req, res) => {
   const id = req.query.id; // Get the ID from the query string
   const query = "SELECT image_of_heritage FROM movable_data WHERE id = ?";
 
-  connection.query(query, [id], (err, results) => {
+  pool.query(query, [id], (err, results) => {
     if (err) {
       console.error("Database error:", err);
       return res.status(500).json({ error: "Database error" });
@@ -3516,7 +3515,7 @@ app.get("/getHeritageImage", (req, res) => {
   const query =
     "SELECT descriptive_image_of_heritage FROM movable_data WHERE id = ?";
 
-  connection.query(query, [id], (err, results) => {
+  pool.query(query, [id], (err, results) => {
     if (err) {
       console.error("Database error:", err);
       return res.status(500).json({ error: "Database error" });
@@ -3545,7 +3544,7 @@ app.get("/getGalleryNonMovImages", (req, res) => {
   const query =
     "SELECT image_of_heritage FROM non_movable_heritage_data WHERE id = ?";
 
-  connection.query(query, [id], (err, results) => {
+  pool.query(query, [id], (err, results) => {
     if (err) {
       console.error("Database error:", err);
       return res.status(500).json({ error: "Database error" });
@@ -3573,7 +3572,7 @@ app.get("/getNonMovHeritageImage", (req, res) => {
   const query =
     "SELECT descriptive_image_of_heritage FROM non_movable_heritage_data WHERE id = ?";
 
-  connection.query(query, [id], (err, results) => {
+  pool.query(query, [id], (err, results) => {
     if (err) {
       console.error("Database error:", err);
       return res.status(500).json({ error: "Database error" });
@@ -3601,7 +3600,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.post("/users", (req, res) => {
   const { name, email, phone } = req.body;
   const query = "INSERT INTO users (name, email, phone) VALUES (?, ?, ?)";
-  connection.query(query, [name, email, phone], (err, result) => {
+  pool.query(query, [name, email, phone], (err, result) => {
     if (err) {
       console.error("Error saving user data: ", err);
       res.status(500).json({ error: "Error saving user data" });
