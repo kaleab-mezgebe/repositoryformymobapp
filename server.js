@@ -17,11 +17,12 @@ const PORT = process.env.PORT || 3000;
 
 const pool = mysql.createPool({
   connectionLimit: 10,
-  host: connectionConfig.host,
-  user: connectionConfig.user,
-  password: connectionConfig.password,
-  database: connectionConfig.database,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
+
 
 pool.getConnection((err, connection) => {
   if (err) {
