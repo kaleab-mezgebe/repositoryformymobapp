@@ -12,7 +12,7 @@ const fs = require("fs");
 const moment = require("moment");
 require("dotenv").config();
 const PORT = process.env.PORT || 3000;
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const pool = mysql.createPool({
   connectionLimit: 10,
