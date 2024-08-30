@@ -12,7 +12,6 @@ const fs = require("fs");
 const moment = require("moment");
 require("dotenv").config();
 const PORT = process.env.PORT || 3000;
-const bcrypt = require('bcryptjs');
 
 const pool = mysql.createPool({
   connectionLimit: 10,
@@ -71,14 +70,19 @@ app.use(express.json());
 //   );
 // });
 
-// 1. Login route
+const crypto = require('crypto');
+
+function hashPassword(password) {
+  return crypto.createHash('sha256').update(password).digest('hex');
+}
+
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
   pool.query(
     "SELECT role, password FROM user WHERE username = ?",
     [username],
-    async (err, results) => {
+    (err, results) => {
       if (err) {
         console.error(err);
         return res.status(500).json({ error: "Internal server error" });
@@ -90,9 +94,9 @@ app.post("/login", (req, res) => {
 
       const user = results[0];
 
-      // Compare the hashed password using bcrypt
-      const match = await bcrypt.compare(password, user.password);
-      if (!match) {
+      // Hash the incoming password and compare it to the stored password
+      const hashedIncomingPassword = hashPassword(password);
+      if (hashedIncomingPassword !== user.password) {
         return res.status(401).json({ error: "Invalid username or password" });
       }
 
