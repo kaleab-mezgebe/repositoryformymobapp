@@ -35,50 +35,11 @@ pool.getConnection((err, connection) => {
 
 app.use(express.json());
 
-// // 1. Login route
-// app.post("/login", (req, res) => {
-//   const { username, password } = req.body;
-
-//   // Query the database to find the user with the provided username.
-//   pool.query(
-//     "SELECT role, password FROM user WHERE username = ?",
-//     [username],
-//     (err, results) => {
-//       if (err) {
-//         console.error(err);
-//         return res.status(500).json({ error: "Internal server error" });
-//       }
-
-//       // If no user is found, indicate the username is invalid.
-//       if (results.length === 0) {
-//         return res.status(401).json({ error: "Invalid username or password" });
-//       }
-
-//       const user = results[0];
-
-//       // Here you should compare hashed passwords (for security)
-//       // For simplicity, we compare plain-text passwords here.
-//       if (user.password !== password) {
-//         return res.status(401).json({ error: "Invalid username or password" });
-//       }
-
-//       // Successful login returns the user's role
-//       return res
-//         .status(200)
-//         .json({ message: "Login successful", role: user.role });
-//     }
-//   );
-// });
-
-const crypto = require('crypto');
-
-function hashPassword(password) {
-  return crypto.createHash('sha256').update(password).digest('hex');
-}
-
+// 1. Login route
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
+  // Query the database to find the user with the provided username.
   pool.query(
     "SELECT role, password FROM user WHERE username = ?",
     [username],
@@ -88,23 +49,62 @@ app.post("/login", (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
       }
 
+      // If no user is found, indicate the username is invalid.
       if (results.length === 0) {
         return res.status(401).json({ error: "Invalid username or password" });
       }
 
       const user = results[0];
 
-      // Hash the incoming password and compare it to the stored password
-      const hashedIncomingPassword = hashPassword(password);
-      if (hashedIncomingPassword !== user.password) {
+      // Here you should compare hashed passwords (for security)
+      // For simplicity, we compare plain-text passwords here.
+      if (user.password !== password) {
         return res.status(401).json({ error: "Invalid username or password" });
       }
 
       // Successful login returns the user's role
-      return res.status(200).json({ message: "Login successful", role: user.role });
+      return res
+        .status(200)
+        .json({ message: "Login successful", role: user.role });
     }
   );
 });
+
+// const crypto = require('crypto');
+
+// function hashPassword(password) {
+//   return crypto.createHash('sha256').update(password).digest('hex');
+// }
+
+// app.post("/login", (req, res) => {
+//   const { username, password } = req.body;
+
+//   pool.query(
+//     "SELECT role, password FROM user WHERE username = ?",
+//     [username],
+//     (err, results) => {
+//       if (err) {
+//         console.error(err);
+//         return res.status(500).json({ error: "Internal server error" });
+//       }
+
+//       if (results.length === 0) {
+//         return res.status(401).json({ error: "Invalid username or password" });
+//       }
+
+//       const user = results[0];
+
+//       // Hash the incoming password and compare it to the stored password
+//       const hashedIncomingPassword = hashPassword(password);
+//       if (hashedIncomingPassword !== user.password) {
+//         return res.status(401).json({ error: "Invalid username or password" });
+//       }
+
+//       // Successful login returns the user's role
+//       return res.status(200).json({ message: "Login successful", role: user.role });
+//     }
+//   );
+// });
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads"); // Set destination folder for uploaded files
