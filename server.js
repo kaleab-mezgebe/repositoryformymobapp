@@ -795,17 +795,15 @@ app.get("/report", (req, res) => {
     }
 
     const data = results.map((result) => ({
-      "ናይ ተጠቃማይ ሽም/መፍለዪ": result.datacollector,
-
-      ሽም: result.first_name,
-      "ሽም ኣቦ": result.last_name,
-      ፆታ: result.gender,
-      "ብዝስዕብ ኣድሚን ተሰሪዙ": result.deletedby,
-      "ዝተሰረዘሉ ጊዜ":  moment(result.deleted_on).format("DD-MM-YYYY HH:MM:SS."),
-      "ውልቃዊ ሓበሬታ ብዝስዕብ ኣድሚን ተመሓይሹ": result.updated_by,
-      "ውልቃዊ ሓበሬታ ዝተመሓየሸሉ ጊዜ ": moment(result.updated_on).format("DD-MM-YYYY HH:MM:SS."),
-       
-    }));
+  "ናይ ተጠቃማይ ሽም/መፍለዪ": result.datacollector,
+  ሽም: result.first_name,
+  "ሽም ኣቦ": result.last_name,
+  ፆታ: result.gender,
+  "ብዝስዕብ ኣድሚን ተሰሪዙ": result.deletedby,
+  "ዝተሰረዘሉ ጊዜ": result.deleted_on ? moment(result.deleted_on).format("DD-MM-YYYY HH:mm:ss") : "", // custom message for null
+  "ውልቃዊ ሓበሬታ ብዝስዕብ ኣድሚን ተመሓይሹ": result.updated_by,
+  "ውልቃዊ ሓበሬታ ዝተመሓየሸሉ ጊዜ": result.updated_on ? moment(result.updated_on).format("DD-MM-YYYY HH:mm:ss") : "", // custom message for null
+}));
     res.json(data);
   });
 });
