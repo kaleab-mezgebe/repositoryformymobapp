@@ -801,9 +801,10 @@ app.get("/report", (req, res) => {
       "ሽም ኣቦ": result.last_name,
       ፆታ: result.gender,
       "ብዝስዕብ ኣድሚን ተሰሪዙ": result.deletedby,
-      "ዝተሰረዘሉ ጊዜ": result.deleted_on,
+      "ዝተሰረዘሉ ጊዜ":  moment(result.deleted_on).format("DD-MM-YYYY HH:MM:SS."),
       "ውልቃዊ ሓበሬታ ብዝስዕብ ኣድሚን ተመሓይሹ": result.updated_by,
-      "ውልቃዊ ሓበሬታ ዝተመሓየሸሉ ጊዜ ": result.updated_on,
+      "ውልቃዊ ሓበሬታ ዝተመሓየሸሉ ጊዜ ": moment(result.updated_on).format("DD-MM-YYYY HH:MM:SS."),
+       
     }));
     res.json(data);
   });
