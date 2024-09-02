@@ -1,5 +1,4 @@
 
-
 const express = require("express");
 const mysql = require("mysql");
 const bodyParser = require("body-parser");
@@ -795,18 +794,20 @@ app.get("/report", (req, res) => {
     }
 
     const data = results.map((result) => ({
-  "ናይ ተጠቃማይ ሽም/መፍለዪ": result.datacollector,
-  ሽም: result.first_name,
-  "ሽም ኣቦ": result.last_name,
-  ፆታ: result.gender,
-  "ብዝስዕብ ኣድሚን ተሰሪዙ": result.deletedby,
-  "ዝተሰረዘሉ ጊዜ": result.deleted_on ? moment(result.deleted_on).format("DD-MM-YYYY HH:mm:ss") : "", // custom message for null
-  "ውልቃዊ ሓበሬታ ብዝስዕብ ኣድሚን ተመሓይሹ": result.updated_by,
-  "ውልቃዊ ሓበሬታ ዝተመሓየሸሉ ጊዜ": result.updated_on ? moment(result.updated_on).format("DD-MM-YYYY HH:mm:ss") : "", // custom message for null
-}));
+      "ናይ ተጠቃማይ ሽም/መፍለዪ": result.datacollector,
+      ሽም: result.first_name,
+      "ሽም ኣቦ": result.last_name,
+      ፆታ: result.gender,
+      "ብዝስዕብ ኣድሚን ተሰሪዙ": result.deletedby ? result.deletedby : "",
+      "ዝተሰረዘሉ ጊዜ": result.deleted_on ? moment(result.deleted_on).format("DD-MM-YYYY HH:mm:ss") : "ኣይጠፍአን",
+      "ውልቃዊ ሓበሬታ ብዝስዕብ ኣድሚን ተመሓይሹ": result.updated_by ? result.updated_by : "",
+      "ውልቃዊ ሓበሬታ ዝተመሓየሸሉ ጊዜ": result.updated_on ? moment(result.updated_on).format("DD-MM-YYYY HH:mm:ss") : "ኣይተመሓየሸን",
+    }));
+
     res.json(data);
   });
 });
+
 
 // 12.1 view Each report in core admin
 app.get("/reportt", (req, res) => {
