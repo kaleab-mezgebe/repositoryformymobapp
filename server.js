@@ -14,12 +14,11 @@ const PORT = process.env.PORT || 3000;
 
 const pool = mysql.createPool({
   connectionLimit: 10,
-  host: 'sql7.freesqldatabase.com',
-  user: 'sql7744241',
-  password: 'kQTEmIlxcn',
-  database: 'sql7744241',
+  host: 'sql12.freesqldatabase.com',
+  user: 'sql12760053',
+  password: '9mHgxRqH6f',
+  database: 'sql12760053',
 });
-
 
 
 
