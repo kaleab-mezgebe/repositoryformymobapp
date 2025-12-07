@@ -12,7 +12,6 @@ const moment = require("moment");
 require("dotenv").config();
 const PORT = process.env.PORT || 3000;
 
-
 const pool = mysql.createPool({
   connectionLimit: 10,
   host: 'sql7.freesqldatabase.com',
@@ -20,9 +19,6 @@ const pool = mysql.createPool({
   password: 'nYVbT7EjGa',
   database: 'sql7810864',
 });
-
-
-
 
 pool.getConnection((err, connection) => {
   if (err) {
