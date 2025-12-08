@@ -824,8 +824,22 @@ app.get("/reportt", (req, res) => {
   });
 });
 //13. Deleting Movable Data
+// app.delete("/movableData/:id", (req, res) => {
+//   const id = req.params.id;
+
+//   const query = "DELETE FROM movable_data WHERE id = ?";
+//   pool.query(query, [id], (err, results) => {
+//     if (err) {
+//       res.status(500).send(err);
+//     } else {
+//       res.status(200).json({ message: "Item deleted successfully" });
+//     }
+//   });
+// });
 app.delete("/movableData/:id", (req, res) => {
   const id = req.params.id;
+
+  console.log("Deleting ID =>", id); // DEBUG HERE
 
   const query = "DELETE FROM movable_data WHERE id = ?";
   pool.query(query, [id], (err, results) => {
@@ -837,9 +851,12 @@ app.delete("/movableData/:id", (req, res) => {
   });
 });
 
+
 //14. Deleting Non Movable Data
 app.delete("/deleteNonMovableData/:id", (req, res) => {
   const id = req.params.id;
+    console.log("Deleting ID =>", id); // DEBUG HERE
+
   const query = "DELETE FROM non_movable_heritage_data WHERE id = ?";
   pool.query(query, [id], (err, results) => {
     if (err) {
