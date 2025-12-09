@@ -836,6 +836,9 @@ app.get("/reportt", (req, res) => {
 //     }
 //   });
 // });
+
+
+
 app.delete("/movableData/:id", (req, res) => {
   const id = req.params.id;
 
@@ -844,12 +847,20 @@ app.delete("/movableData/:id", (req, res) => {
   const query = "DELETE FROM movable_data WHERE id = ?";
   pool.query(query, [id], (err, results) => {
     if (err) {
+      console.error("Error deleting movable data:", err);
       res.status(500).send(err);
     } else {
-      res.status(200).json({ message: "Item deleted successfully" });
+      if (results.affectedRows === 0) {
+        console.warn(`No movable data found with ID: ${id}`);
+        res.status(404).json({ message: "Movable data not found or already deleted" });
+      } else {
+        console.log(`Movable data with ID: ${id} deleted successfully. Affected rows: ${results.affectedRows}`);
+        res.status(200).json({ message: "Item deleted successfully" });
+      }
     }
   });
 });
+
 
 
 //14. Deleting Non Movable Data
